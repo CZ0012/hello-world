@@ -5,7 +5,7 @@ import Mathlib.NumberTheory.ModularForms.Basic
 # Modular forms through equalizer fibers
 
 The slash-invariance condition is an equalizer fiber of two rules: the slash-action profile and the
-constant profile.  Holomorphy and cusp conditions are further predicates on this structural fiber.
+constant profile. Holomorphy and cusp conditions are further predicates on this structural fiber.
 -/
 
 namespace FiberAggregation
@@ -13,6 +13,8 @@ namespace ModularAnalysis
 
 open Complex UpperHalfPlane Matrix.SpecialLinearGroup
 open scoped MatrixGroups ModularForm
+
+noncomputable section
 
 /-- The complete slash-action profile of a function. -/
 def slashProfile (Γ : Subgroup (GL (Fin 2) ℝ)) (k : ℤ) (f : ℍ → ℂ) :
@@ -65,5 +67,6 @@ theorem oddWeightDeterminate
     rw [ModularForm.eq_zero_of_neg_one_mem h_neg_one hk f,
       ModularForm.eq_zero_of_neg_one_mem h_neg_one hk g]
 
+end
 end ModularAnalysis
 end FiberAggregation
