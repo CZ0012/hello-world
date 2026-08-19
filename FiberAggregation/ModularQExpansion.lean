@@ -30,6 +30,7 @@ theorem qExpansionRule_injective
   intro f g hfg
   apply sub_eq_zero.mp
   apply (ModularForm.qExpansion_eq_zero_iff hh hΓ (f - g)).mp
+  change qExpansion h ((f : ℍ → ℂ) - (g : ℍ → ℂ)) = 0
   rw [ModularForm.qExpansion_sub hh hΓ f g]
   change qExpansionRule Γ h k f - qExpansionRule Γ h k g = 0
   rw [hfg, sub_self]
