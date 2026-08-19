@@ -22,9 +22,12 @@ jobs:
         run: |
           curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
           echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
-      - name: Resolve dependencies
-        run: lake update
-      - name: Download mathlib cache
+      - name: Download pinned mathlib cache
         run: lake exe cache get
+      - name: Reject proof placeholders
+        run: |
+          if grep -R -n -E '(^|[^[:alnum:]_])(sorry|admit)([^[:alnum:]_]|$)' FiberAggregation.lean FiberAggregation; then
+            exit 1
+          fi
       - name: Build and verify proofs
         run: lake build --wfail
