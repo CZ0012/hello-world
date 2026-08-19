@@ -66,6 +66,8 @@ theorem card_orbit_mul_card_stabilizerFiber_eq_card_group
     (x : X) [Fintype G] [Fintype (MulAction.orbit G x)] :
     Fintype.card (MulAction.orbit G x) * Fintype.card (StabilizerFiber G x) =
       Fintype.card G := by
+  letI : Fintype (MulAction.stabilizer G x) :=
+    Fintype.ofEquiv (StabilizerFiber G x) (stabilizerFiberEquiv G x)
   rw [Fintype.card_congr (stabilizerFiberEquiv G x)]
   exact MulAction.card_orbit_mul_card_stabilizer_eq_card_group G x
 
