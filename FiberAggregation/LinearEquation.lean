@@ -3,7 +3,7 @@ import FiberAggregation.Core
 /-!
 # Linear equations as affine fibers
 
-For a linear or additive operator, every nonempty solution fiber is a torsor for the kernel.  This
+For a linear or additive operator, every nonempty solution fiber is a torsor for the kernel. This
 is the structural statement underlying uniqueness modulo homogeneous solutions for linear PDEs.
 -/
 
@@ -27,7 +27,6 @@ def solutionFiberKernelEquiv (L : U →+ V) (u₀ : U) :
       rw [map_sub, u.2, sub_self]⟩
   invFun k :=
     ⟨k.1 + u₀, by
-      change L (k.1 + u₀) = L u₀
       rw [map_add, show L k.1 = 0 from k.2, zero_add]⟩
   left_inv := by
     intro u
