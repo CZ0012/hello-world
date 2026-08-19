@@ -10,7 +10,7 @@ This file gives a conservative Lean model of the proposed language:
 * the uncertainty over an observable value is the corresponding fiber;
 * aggregation of all fibers is a dependent sum.
 
-The development is intentionally relative to Lean's type theory.  It does not claim that the two
+The development is intentionally relative to Lean's type theory. It does not claim that the two
 words `aggregate` and `fiber` have already been installed as a new proof-theoretic foundation.
 Instead, it isolates the structural laws that any proposed foundation should validate.
 -/
@@ -26,7 +26,12 @@ abbrev Rule (A : Type u) (B : Type v) := A → B
 def Fiber {A : Type u} {B : Type v} (f : A → B) (b : B) : Type u :=
   {a : A // f a = b}
 
-/-- The aggregate on which two rules agree.  It is the pullback of the diagonal. -/
+/-- Finite domains induce finite fibers. -/
+noncomputable instance instFintypeFiber {A : Type u} {B : Type v} [Fintype A]
+    (f : A → B) (b : B) : Fintype (Fiber f b) :=
+  Fintype.ofFinite _
+
+/-- The aggregate on which two rules agree. It is the pullback of the diagonal. -/
 def EqFiber {A : Type u} {B : Type v} (f g : A → B) : Type u :=
   {a : A // f a = g a}
 
@@ -63,7 +68,7 @@ def fiberCompEquiv {A : Type u} {B : Type v} {C : Type w}
     rfl
   right_inv := by
     rintro ⟨⟨b, hb⟩, ⟨a, ha⟩⟩
-    subst b
+    cases ha
     rfl
 
 /-- The projection of a dependent aggregate onto its indexing aggregate. -/
@@ -127,14 +132,5 @@ theorem card_eq_sum_fiber {A : Type u} {B : Type v}
 theorem self_fiber_card_conservation {A : Type u} [Fintype A] (f : A → A) :
     ∑ a : A, Fintype.card (Fiber f a) = Fintype.card A := by
   simpa using (card_eq_sum_fiber f).symm
-
-/-- A finite surjective self-rule has exactly one point in every fiber. -/
-theorem card_fiber_eq_one_of_surjective_self {A : Type u} [Fintype A]
-    (f : A → A) (hf : Function.Surjective f) (a : A) :
-    Fintype.card (Fiber f a) = 1 := by
-  have hinj : Function.Injective f := Finite.injective_of_surjective hf
-  exact Fintype.card_eq_one_iff.mpr
-    ⟨⟨Classical.choose (hf a), Classical.choose_spec (hf a)⟩,
-      fiber_subsingleton_of_injective hinj a⟩
 
 end FiberAggregation
