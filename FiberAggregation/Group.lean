@@ -3,11 +3,11 @@ import FiberAggregation.Core
 /-!
 # Group theory as fiber geometry
 
-Stabilizers and kernels are literal fibers.  Orbit–stabilizer then becomes a finite aggregation
+Stabilizers and kernels are literal fibers. Orbit–stabilizer then becomes a finite aggregation
 formula for an orbit rule.
 -/
 
-universe u v w
+universe u v
 
 namespace FiberAggregation
 
@@ -20,16 +20,16 @@ def orbitRule (x : X) : G → X :=
   fun g => g • x
 
 /-- The stabilizer written as the fiber of the orbit rule over its base point. -/
-def StabilizerFiber (x : X) : Type u :=
+abbrev StabilizerFiber (x : X) : Type u :=
   Fiber (orbitRule G x) x
 
 /-- The stabilizer fiber is equivalent to mathlib's bundled stabilizer subgroup. -/
 def stabilizerFiberEquiv (x : X) :
     StabilizerFiber G x ≃ MulAction.stabilizer G x where
   toFun g :=
-    ⟨g.1, by simpa [StabilizerFiber, orbitRule] using g.2⟩
+    ⟨g.1, show g.1 • x = x from g.2⟩
   invFun g :=
-    ⟨g.1, by simpa [StabilizerFiber, orbitRule] using g.2⟩
+    ⟨g.1, show (g.1 : G) • x = x from g.2⟩
   left_inv := by
     intro g
     apply Subtype.ext
@@ -45,11 +45,13 @@ def orbitFiberEquiv (x : X) (g₀ : G) :
   toFun g :=
     ⟨g₀ * g.1, by
       change (g₀ * g.1) • x = g₀ • x
-      rw [mul_smul, g.2]⟩
+      have hg : g.1 • x = x := g.2
+      rw [mul_smul, hg]⟩
   invFun g :=
     ⟨g₀⁻¹ * g.1, by
       change (g₀⁻¹ * g.1) • x = x
-      rw [mul_smul, g.2, inv_smul_smul]⟩
+      have hg : g.1 • x = g₀ • x := g.2
+      rw [mul_smul, hg, inv_smul_smul]⟩
   left_inv := by
     intro g
     apply Subtype.ext
@@ -74,13 +76,15 @@ section Kernel
 variable {G : Type u} {H : Type v} [Group G] [Group H]
 
 /-- The kernel of a homomorphism written as the fiber over the unit. -/
-def KernelFiber (φ : G →* H) : Type u :=
+abbrev KernelFiber (φ : G →* H) : Type u :=
   Fiber φ 1
 
 /-- The kernel fiber is equivalent to the bundled kernel subgroup. -/
 def kernelFiberEquiv (φ : G →* H) : KernelFiber φ ≃ φ.ker where
-  toFun g := ⟨g.1, by simpa [KernelFiber] using g.2⟩
-  invFun g := ⟨g.1, by simpa [KernelFiber] using g.2⟩
+  toFun g :=
+    ⟨g.1, show φ g.1 = 1 from g.2⟩
+  invFun g :=
+    ⟨g.1, show φ g.1 = 1 from g.2⟩
   left_inv := by
     intro g
     apply Subtype.ext
