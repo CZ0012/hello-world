@@ -4,8 +4,8 @@ import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
 /-!
 # Weierstrass equations as fibers
 
-An affine Weierstrass equation is the zero fiber of its residual rule.  The standard elliptic-curve
-negation is an involutive self-rule preserving every residual fiber.  We also record mathlib's
+An affine Weierstrass equation is the zero fiber of its residual rule. The standard elliptic-curve
+negation is an involutive self-rule preserving every residual fiber. We also record mathlib's
 fundamental relation among `c₄`, `c₆`, and the discriminant as an equalizer-fiber witness.
 -/
 
@@ -51,12 +51,10 @@ def negateFiberEquiv (W : WeierstrassCurve R) (c : R) :
     Fiber (weierstrassResidual W) c ≃ Fiber (weierstrassResidual W) c where
   toFun p :=
     ⟨negatePoint W p.1, by
-      change weierstrassResidual W (negatePoint W p.1) = c
       rw [residual_negatePoint]
       exact p.2⟩
   invFun p :=
     ⟨negatePoint W p.1, by
-      change weierstrassResidual W (negatePoint W p.1) = c
       rw [residual_negatePoint]
       exact p.2⟩
   left_inv := by
