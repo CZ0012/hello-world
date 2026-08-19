@@ -1,12 +1,13 @@
 import FiberAggregation.Core
-import Mathlib.AlgebraicGeometry.EllipticCurve.Weierstrass
+import Mathlib.AlgebraicGeometry.EllipticCurve.ModelsWithJ
 
 /-!
-# Weierstrass equations as fibers
+# Weierstrass equations and j-invariant fibers
 
 An affine Weierstrass equation is the zero fiber of its residual rule. The standard elliptic-curve
-negation is an involutive self-rule preserving every residual fiber. We also record mathlib's
-fundamental relation among `c₄`, `c₆`, and the discriminant as an equalizer-fiber witness.
+negation is an involutive self-rule preserving every residual fiber. We also record the fundamental
+relation among `c₄`, `c₆`, and the discriminant, and organize elliptic models by fibers of the
+j-invariant rule.
 -/
 
 universe u
@@ -79,6 +80,44 @@ def cRelationRight (W : WeierstrassCurve R) : R :=
 def cRelationWitness (W : WeierstrassCurve R) :
     EqFiber (cRelationLeft : WeierstrassCurve R → R) cRelationRight :=
   ⟨W, W.c_relation⟩
+
+section JInvariant
+
+variable {F : Type u} [Field F] [DecidableEq F]
+
+/-- Weierstrass models equipped with a proof that their discriminant is invertible. -/
+abbrev EllipticModel (F : Type u) [Field F] :=
+  {W : WeierstrassCurve F // W.IsElliptic}
+
+/-- The j-invariant as a rule from elliptic models to the base field. -/
+noncomputable def jRule (E : EllipticModel F) : F := by
+  letI : E.1.IsElliptic := E.2
+  exact E.1.j
+
+/-- The aggregate of elliptic models with prescribed j-invariant. -/
+def JFiber (j : F) : Type u :=
+  Fiber (jRule (F := F)) j
+
+/-- The explicit model supplied by mathlib for a prescribed j-invariant. -/
+noncomputable def ofJModel (j : F) : EllipticModel F :=
+  ⟨WeierstrassCurve.ofJ j, inferInstance⟩
+
+/-- The explicit model really lies over its prescribed j-invariant. -/
+theorem jRule_ofJModel (j : F) :
+    jRule (ofJModel j) = j := by
+  change (WeierstrassCurve.ofJ j).j = j
+  exact WeierstrassCurve.ofJ_j j
+
+/-- Every j-fiber is inhabited. -/
+noncomputable def jFiberWitness (j : F) : JFiber j :=
+  ⟨ofJModel j, jRule_ofJModel j⟩
+
+/-- The j-invariant rule on elliptic models is surjective over every field. -/
+theorem jRule_surjective : Function.Surjective (jRule (F := F)) := by
+  intro j
+  exact ⟨ofJModel j, jRule_ofJModel j⟩
+
+end JInvariant
 
 end EllipticAnalysis
 end FiberAggregation
