@@ -100,21 +100,23 @@ def JFiber (j : F) : Type u :=
   Fiber (jRule (F := F)) j
 
 /-- The explicit model supplied by mathlib for a prescribed j-invariant. -/
-noncomputable def ofJModel [DecidableEq F] (j : F) : EllipticModel F :=
-  ⟨WeierstrassCurve.ofJ j, inferInstance⟩
+noncomputable def ofJModel (j : F) : EllipticModel F := by
+  classical
+  exact ⟨WeierstrassCurve.ofJ j, inferInstance⟩
 
 /-- The explicit model really lies over its prescribed j-invariant. -/
-theorem jRule_ofJModel [DecidableEq F] (j : F) :
+theorem jRule_ofJModel (j : F) :
     jRule (ofJModel j) = j := by
+  classical
   change (WeierstrassCurve.ofJ j).j = j
   exact WeierstrassCurve.ofJ_j j
 
 /-- Every j-fiber is inhabited. -/
-noncomputable def jFiberWitness [DecidableEq F] (j : F) : JFiber j :=
+noncomputable def jFiberWitness (j : F) : JFiber j :=
   ⟨ofJModel j, jRule_ofJModel j⟩
 
-/-- The j-invariant rule on elliptic models is surjective over every field with decidable equality. -/
-theorem jRule_surjective [DecidableEq F] : Function.Surjective (jRule (F := F)) := by
+/-- The j-invariant rule on elliptic models is surjective over every field. -/
+theorem jRule_surjective : Function.Surjective (jRule (F := F)) := by
   intro j
   exact ⟨ofJModel j, jRule_ofJModel j⟩
 
