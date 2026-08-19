@@ -28,8 +28,10 @@ def Fiber {A : Type u} {B : Type v} (f : A → B) (b : B) : Type u :=
 
 /-- Finite domains induce finite fibers. -/
 noncomputable instance instFintypeFiber {A : Type u} {B : Type v} [Fintype A]
-    (f : A → B) (b : B) : Fintype (Fiber f b) :=
-  Fintype.ofFinite _
+    (f : A → B) (b : B) : Fintype (Fiber f b) := by
+  classical
+  unfold Fiber
+  infer_instance
 
 /-- The aggregate on which two rules agree. It is the pullback of the diagonal. -/
 def EqFiber {A : Type u} {B : Type v} (f g : A → B) : Type u :=
