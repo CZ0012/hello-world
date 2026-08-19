@@ -84,7 +84,7 @@ def cRelationWitness (W : WeierstrassCurve R) :
 
 section JInvariant
 
-variable {F : Type u} [Field F] [DecidableEq F]
+variable {F : Type u} [Field F]
 
 /-- Weierstrass models equipped with a proof that their discriminant is invertible. -/
 abbrev EllipticModel (F : Type u) [Field F] :=
@@ -100,28 +100,27 @@ def JFiber (j : F) : Type u :=
   Fiber (jRule (F := F)) j
 
 /-- The explicit model supplied by mathlib for a prescribed j-invariant. -/
-noncomputable def ofJModel (j : F) : EllipticModel F :=
+noncomputable def ofJModel [DecidableEq F] (j : F) : EllipticModel F :=
   ⟨WeierstrassCurve.ofJ j, inferInstance⟩
 
 /-- The explicit model really lies over its prescribed j-invariant. -/
-theorem jRule_ofJModel (j : F) :
+theorem jRule_ofJModel [DecidableEq F] (j : F) :
     jRule (ofJModel j) = j := by
   change (WeierstrassCurve.ofJ j).j = j
   exact WeierstrassCurve.ofJ_j j
 
 /-- Every j-fiber is inhabited. -/
-noncomputable def jFiberWitness (j : F) : JFiber j :=
+noncomputable def jFiberWitness [DecidableEq F] (j : F) : JFiber j :=
   ⟨ofJModel j, jRule_ofJModel j⟩
 
-/-- The j-invariant rule on elliptic models is surjective over every field. -/
-theorem jRule_surjective : Function.Surjective (jRule (F := F)) := by
+/-- The j-invariant rule on elliptic models is surjective over every field with decidable equality. -/
+theorem jRule_surjective [DecidableEq F] : Function.Surjective (jRule (F := F)) := by
   intro j
   exact ⟨ofJModel j, jRule_ofJModel j⟩
 
 /-- Over a separably closed field, every j-fiber is a single orbit under admissible changes of
 Weierstrass variables. Thus equal visible j-invariant does not mean literal equality of models, but
 it does determine the model up to the specified symmetry rule. -/
-omit [DecidableEq F] in
 theorem jFiber_single_variableChange_orbit [IsSepClosed F] {j : F}
     (E E' : JFiber (F := F) j) :
     ∃ C : WeierstrassCurve.VariableChange F, C • E.1.1 = E'.1.1 := by
