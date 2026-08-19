@@ -3,7 +3,7 @@ import FiberAggregation.Core
 /-!
 # Derived logical operations
 
-The symbols below are not proposed as new primitives.  They demonstrate how dependent products,
+The symbols below are not proposed as new primitives. They demonstrate how dependent products,
 dependent sums, and pullback fibers recover the usual logical operations after suitable truncation.
 -/
 
@@ -39,29 +39,16 @@ theorem injective_iff_thin {A : Type u} {S : Type v} (m : S → A) :
     letI : Subsingleton (Fiber m (m x)) := hm (m x)
     exact congrArg Subtype.val (Subsingleton.elim x' y')
 
-/-- A coherent section is precisely a right inverse of the projection of its total aggregate. -/
-def allEquivSections {A : Type u} (E : A → Type v) :
-    All E ≃ {s : A → (Σ a, E a) // sigmaProjection E ∘ s = id} where
-  toFun s :=
-    ⟨fun a => ⟨a, s a⟩, by
-      funext a
-      rfl⟩
-  invFun s := fun a =>
-    (show E ((sigmaProjection E ∘ s.1) a) from s.1 a |>.2) |> (by
-      rw [s.2]
-      exact id)
-  left_inv := by
-    intro s
-    rfl
-  right_inv := by
-    intro s
-    apply Subtype.ext
+/-- Every coherent dependent choice produces a right inverse of the total-aggregate projection. -/
+def sectionOfAll {A : Type u} (E : A → Type v) (s : All E) :
+    {t : A → (Σ a, E a) // sigmaProjection E ∘ t = id} :=
+  ⟨fun a => ⟨a, s a⟩, by
     funext a
-    have h := congrFun s.2 a
-    cases s.1 a with
-    | mk a' e =>
-      dsimp [sigmaProjection, Function.comp_def] at h
-      cases h
-      rfl
+    rfl⟩
+
+@[simp]
+theorem sectionOfAll_apply {A : Type u} (E : A → Type v) (s : All E) (a : A) :
+    (sectionOfAll E s).1 a = ⟨a, s a⟩ :=
+  rfl
 
 end FiberAggregation
