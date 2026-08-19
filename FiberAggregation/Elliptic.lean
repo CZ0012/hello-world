@@ -121,6 +121,7 @@ theorem jRule_surjective : Function.Surjective (jRule (F := F)) := by
 /-- Over a separably closed field, every j-fiber is a single orbit under admissible changes of
 Weierstrass variables. Thus equal visible j-invariant does not mean literal equality of models, but
 it does determine the model up to the specified symmetry rule. -/
+omit [DecidableEq F] in
 theorem jFiber_single_variableChange_orbit [IsSepClosed F] {j : F}
     (E E' : JFiber (F := F) j) :
     ∃ C : WeierstrassCurve.VariableChange F, C • E.1.1 = E'.1.1 := by
