@@ -1,5 +1,6 @@
 import FiberAggregation.Core
 import Mathlib.AlgebraicGeometry.EllipticCurve.ModelsWithJ
+import Mathlib.AlgebraicGeometry.EllipticCurve.IsomOfJ
 
 /-!
 # Weierstrass equations and j-invariant fibers
@@ -116,6 +117,21 @@ noncomputable def jFiberWitness (j : F) : JFiber j :=
 theorem jRule_surjective : Function.Surjective (jRule (F := F)) := by
   intro j
   exact ⟨ofJModel j, jRule_ofJModel j⟩
+
+/-- Over a separably closed field, every j-fiber is a single orbit under admissible changes of
+Weierstrass variables. Thus equal visible j-invariant does not mean literal equality of models, but
+it does determine the model up to the specified symmetry rule. -/
+theorem jFiber_single_variableChange_orbit [IsSepClosed F] {j : F}
+    (E E' : JFiber (F := F) j) :
+    ∃ C : WeierstrassCurve.VariableChange F, C • E.1.1 = E'.1.1 := by
+  letI : E.1.1.IsElliptic := E.1.2
+  letI : E'.1.1.IsElliptic := E'.1.2
+  apply WeierstrassCurve.exists_variableChange_of_j_eq
+  have hE : E.1.1.j = j := by
+    simpa [jRule] using E.2
+  have hE' : E'.1.1.j = j := by
+    simpa [jRule] using E'.2
+  exact hE.trans hE'.symm
 
 end JInvariant
 
