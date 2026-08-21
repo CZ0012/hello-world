@@ -1,0 +1,37 @@
+name: Lean verification
+
+on:
+  push:
+    branches:
+      - fiber-aggregation-lean
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: lean-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Install Elan
+        run: |
+          curl https://elan.lean-lang.org/elan-init.sh -sSf | sh -s -- -y --default-toolchain none
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
+      - name: Download pinned mathlib cache
+        run: lake exe cache get
+      - name: Reject proof placeholders
+        run: |
+          if grep -R -n -E '(^|[^[:alnum:]_])(sorry|admit)([^[:alnum:]_]|$)' FiberAggregation.lean FiberAggregation; then
+            exit 1
+          fi
+      - name: Build and verify proofs
+        run: lake build --wfail
