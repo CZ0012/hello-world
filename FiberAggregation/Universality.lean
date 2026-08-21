@@ -4,18 +4,19 @@ import FiberAggregation.Diagonal
 /-!
 # Stratified universality and self-classification obstructions
 
-This file separates two very different claims:
+This file separates several very different claims:
 
-1. At a fixed universe level, there is a higher-level aggregate whose fibers contain every small
-   aggregate.  In Lean this is the universal family
+1. At a fixed universe level, there is a higher-level aggregate coding every small aggregate.
+2. There is likewise a higher-level aggregate whose points are all small rules between small
+   aggregates.
+3. The universal family `Sigma (A : Type u), A -> Type u` contains every small aggregate as a
+   fiber and classifies the fiber decomposition of every small-domain rule.
+4. A same-level aggregate cannot, through an unrestricted self-evaluator, classify every rule into
+   an observable aggregate that has a fixed-point-free polarity. Boolean comprehension is the
+   clearest instance.
 
-   `Sigma (A : Type u), A -> Type u`.
-
-2. A same-level aggregate cannot, through a Boolean membership/evaluation rule, classify every
-   Boolean-valued subaggregate of itself.  This is the direct diagonal obstruction.
-
-The first construction is predicative and stratified.  The second theorem identifies the additional
-self-evaluation/comprehension strength that is incompatible with Boolean negation.
+The positive constructions are predicative and stratified. The negative results identify the
+additional self-evaluation/comprehension strength that triggers diagonal contradiction.
 -/
 
 universe u v w
@@ -26,6 +27,44 @@ namespace Universality
 /-- The code aggregate for all Lean aggregates in `Type u`.
 It lives one universe level above the aggregates it codes. -/
 abbrev SmallAggregateUniverse : Type (u + 1) := Type u
+
+/-- The aggregate of all rules from a `u`-small aggregate to a `v`-small aggregate. A point keeps
+its source, target, and rule together, so no untyped application is introduced. -/
+def SmallRuleUniverse :=
+  Sigma fun A : Type u => Sigma fun B : Type v => A → B
+
+/-- Package an arbitrary small rule as a point of the stratified rule aggregate. -/
+def ruleCode {A : Type u} {B : Type v} (f : A → B) :
+    SmallRuleUniverse (u := u) (v := v) :=
+  ⟨A, B, f⟩
+
+/-- Source aggregate of a coded rule. -/
+def codedRuleSource (r : SmallRuleUniverse (u := u) (v := v)) : Type u :=
+  r.1
+
+/-- Target aggregate of a coded rule. -/
+def codedRuleTarget (r : SmallRuleUniverse (u := u) (v := v)) : Type v :=
+  r.2.1
+
+/-- Decode and apply a coded rule, retaining its dependent source and target. -/
+def codedRuleMap (r : SmallRuleUniverse (u := u) (v := v)) :
+    codedRuleSource r → codedRuleTarget r :=
+  r.2.2
+
+@[simp]
+theorem codedRuleSource_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+    codedRuleSource (ruleCode f) = A :=
+  rfl
+
+@[simp]
+theorem codedRuleTarget_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+    codedRuleTarget (ruleCode f) = B :=
+  rfl
+
+@[simp]
+theorem codedRuleMap_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+    codedRuleMap (ruleCode f) = f :=
+  rfl
 
 /-- The total aggregate of the universal family of `u`-small aggregates. -/
 def UniversalFiberTotal : Type (u + 1) :=
@@ -65,7 +104,7 @@ theorem universalFiberRule_containsAllSmallAggregates :
   intro A
   exact ⟨A, ⟨universalFiberEquiv A⟩⟩
 
-/-- The classifier of the fibers of an arbitrary rule. -/
+/-- The classifier of the local fibers of an arbitrary rule. -/
 def fiberClassifier {A : Type u} {B : Type v} (f : A → B) : B → Type u :=
   fun b => Fiber f b
 
@@ -73,7 +112,7 @@ def fiberClassifier {A : Type u} {B : Type v} (f : A → B) : B → Type u :=
 abbrev ClassifiedRuleTotal {A : Type u} {B : Type v} (f : A → B) : Type (max u v) :=
   Sigma fun b : B => fiberClassifier f b
 
-/-- Classifying all fibers of a rule and aggregating them reconstructs its domain. -/
+/-- Classifying all local fibers of a rule and aggregating them reconstructs its domain. -/
 def classifiedRuleTotalEquivDomain {A : Type u} {B : Type v} (f : A → B) :
     ClassifiedRuleTotal f ≃ A := by
   simpa [ClassifiedRuleTotal, fiberClassifier] using totalFiberEquiv f
@@ -85,7 +124,8 @@ theorem classifiedRuleProjection_compatible
   rcases x with ⟨b, ⟨a, h⟩⟩
   exact h.symm
 
-/-- Every fiber of every rule with `u`-small domain occurs as a fiber of the universal family. -/
+/-- Every local fiber of every rule with `u`-small domain occurs as a fiber of the universal
+family. -/
 def everyRuleFiberOccursInUniversalFamily
     {A : Type u} {B : Type v} (f : A → B) (b : B) :
     Fiber (universalFiberRule (u := u)) (fiberClassifier f b) ≃ Fiber f b :=
@@ -98,6 +138,24 @@ def SelfCodes (Code : Type u) (El : Code → Type u) : Prop :=
 /-- A trivial self-code exists, demonstrating that self-reference alone is not contradictory. -/
 theorem unit_selfCodes : SelfCodes Unit (fun _ : Unit => Unit) :=
   ⟨(), ⟨Equiv.refl Unit⟩⟩
+
+/-- A same-level evaluator classifies all endorules when every `U → U` rule is one of its rows. -/
+def ClassifiesAllEndorules {U : Type u} (evaluate : U → U → U) : Prop :=
+  WeaklyPointSurjective evaluate
+
+/-- Complete same-level classification of endorules forces every endorule to have a fixed point. -/
+theorem fullSelfRuleClassifier_forcesFixedPoint
+    {U : Type u} (evaluate : U → U → U)
+    (hcomplete : ClassifiesAllEndorules evaluate) (rule : U → U) :
+    ∃ value : U, rule value = value :=
+  lawvere_fixedPoint evaluate hcomplete rule
+
+/-- Hence a fixed-point-free self-rule forbids complete same-level classification of all endorules. -/
+theorem no_sameLevel_fullRuleClassifier_of_fixedPointFree
+    {U : Type u} (evaluate : U → U → U) (polarity : U → U)
+    (hpolarity : ∀ value, polarity value ≠ value) :
+    ¬ClassifiesAllEndorules evaluate :=
+  no_complete_self_encoding_of_fixedPointFree evaluate polarity hpolarity
 
 /-- A Boolean membership table classifies all Boolean subaggregates of `U` when every profile
 `U → Bool` occurs as one of its rows. -/
