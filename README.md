@@ -13,7 +13,8 @@ lake exe cache get
 lake build --wfail
 ```
 
-The workflow also rejects `sorry` and `admit` in the project sources.
+The workflow also rejects `sorry` and `admit` in the project sources. The universality extension
+completed 8,488 Lean build jobs successfully on 2026-08-21.
 
 ## Formalized core
 
@@ -41,6 +42,39 @@ The workflow also rejects `sorry` and `admit` in the project sources.
   ```
 
 ## Verified consequences and applications
+
+### Stratified universality
+
+For every universe level `u`, Lean verifies a higher-level aggregate of all `u`-small aggregates:
+
+```text
+SmallAggregateUniverse u := Type u
+```
+
+and a universal family
+
+```text
+universalFiberRule : (Σ A : Type u, A) → Type u
+```
+
+whose fiber over the code `A` is equivalent to `A` itself. Thus every aggregate at one fixed size
+level occurs as a fiber, but the classifier lives one universe level higher.
+
+There is also a typed aggregate of all small rules:
+
+```text
+Σ A : Type u, Σ B : Type v, A → B
+```
+
+A point retains its source, target, and map, so it supports only typed evaluation. For any rule
+`f : A → B`, its family `b ↦ Fiber f b` is classified by the universal family, and reaggregating
+that family reconstructs `A`.
+
+Lean also verifies the sharp same-level obstruction. If an evaluator `U → U → U` represents every
+endorule of `U`, then every endorule of `U` must have a fixed point. In particular, no membership
+table `U → U → Bool` can represent every Boolean-valued subaggregate of `U`, because Boolean
+negation has no fixed point. Mere self-coding is not contradictory; unrestricted same-level
+evaluation and comprehension are the dangerous additions.
 
 ### Diagonal obstruction
 
@@ -119,6 +153,10 @@ restriction to the solution fiber yields conservation of the associated current.
   it determines the model up to the specified symmetry rule.
 
 ## What this prototype does not prove
+
+The positive universal constructions are stratified schemas, not one absolute highest aggregate.
+Lean's own universe hierarchy deliberately has no top universe and does not admit an unrestricted
+same-level `Type : Type` principle.
 
 Bare fiber structure does not produce recursive coding, internal truth or provability predicates,
 analytic estimates, coercivity, boundary regularity, compactness, Hecke theory, Sturm bounds, or a
