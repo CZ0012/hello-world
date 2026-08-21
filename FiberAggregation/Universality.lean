@@ -19,8 +19,6 @@ The positive constructions are predicative and stratified. The negative results 
 additional self-evaluation/comprehension strength that triggers diagonal contradiction.
 -/
 
-universe u v w
-
 namespace FiberAggregation
 namespace Universality
 
@@ -30,7 +28,7 @@ abbrev SmallAggregateUniverse.{u} : Type (u + 1) := Type u
 
 /-- The aggregate of all rules from a `u`-small aggregate to a `v`-small aggregate. A point keeps
 its source, target, and rule together, so no untyped application is introduced. -/
-def SmallRuleUniverse.{u, v} : Type (max (u + 1) (v + 1)) :=
+def SmallRuleUniverse.{u, v} :=
   Sigma fun A : Type u => Sigma fun B : Type v => A → B
 
 /-- Package an arbitrary small rule as a point of the stratified rule aggregate. -/
@@ -52,17 +50,17 @@ def codedRuleMap.{u, v} (r : SmallRuleUniverse.{u, v}) :
   r.2.2
 
 @[simp]
-theorem codedRuleSource_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+theorem codedRuleSource_ruleCode.{u, v} {A : Type u} {B : Type v} (f : A → B) :
     codedRuleSource (ruleCode f) = A :=
   rfl
 
 @[simp]
-theorem codedRuleTarget_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+theorem codedRuleTarget_ruleCode.{u, v} {A : Type u} {B : Type v} (f : A → B) :
     codedRuleTarget (ruleCode f) = B :=
   rfl
 
 @[simp]
-theorem codedRuleMap_ruleCode {A : Type u} {B : Type v} (f : A → B) :
+theorem codedRuleMap_ruleCode.{u, v} {A : Type u} {B : Type v} (f : A → B) :
     codedRuleMap (ruleCode f) = f :=
   rfl
 
@@ -87,13 +85,13 @@ def CodesAllSmallAggregates.{u, v} (Code : Type v) (El : Code → Type u) : Prop
   ∀ A : Type u, ∃ code : Code, Nonempty (El code ≃ A)
 
 /-- `Type u`, viewed from the next universe, codes all aggregates in `Type u`. -/
-theorem smallAggregateUniverse_codesAll :
+theorem smallAggregateUniverse_codesAll.{u} :
     CodesAllSmallAggregates (Type u) (fun A : Type u => A) := by
   intro A
   exact ⟨A, ⟨Equiv.refl A⟩⟩
 
 /-- The stratified universal fiber rule contains every `u`-small aggregate as a fiber. -/
-theorem universalFiberRule_containsAllSmallAggregates (A : Type u) :
+theorem universalFiberRule_containsAllSmallAggregates.{u} (A : Type u) :
     ∃ code : SmallAggregateUniverse.{u},
       Nonempty (Fiber universalFiberRule.{u} code ≃ A) :=
   ⟨A, ⟨universalFiberEquiv A⟩⟩
@@ -113,7 +111,7 @@ def classifiedRuleTotalEquivDomain.{u, v} {A : Type u} {B : Type v} (f : A → B
   simpa [ClassifiedRuleTotal, fiberClassifier] using totalFiberEquiv f
 
 /-- The reconstructed total aggregate still lies over the original base point. -/
-theorem classifiedRuleProjection_compatible
+theorem classifiedRuleProjection_compatible.{u, v}
     {A : Type u} {B : Type v} (f : A → B) (x : ClassifiedRuleTotal f) :
     x.1 = f (classifiedRuleTotalEquivDomain f x) := by
   rcases x with ⟨b, ⟨a, h⟩⟩
@@ -140,14 +138,14 @@ def ClassifiesAllEndorules.{u} {U : Type u} (evaluate : U → U → U) : Prop :=
   WeaklyPointSurjective evaluate
 
 /-- Complete same-level classification of endorules forces every endorule to have a fixed point. -/
-theorem fullSelfRuleClassifier_forcesFixedPoint
+theorem fullSelfRuleClassifier_forcesFixedPoint.{u}
     {U : Type u} (evaluate : U → U → U)
     (hcomplete : ClassifiesAllEndorules evaluate) (rule : U → U) :
     ∃ value : U, rule value = value :=
   lawvere_fixedPoint evaluate hcomplete rule
 
 /-- Hence a fixed-point-free self-rule forbids complete same-level classification of all endorules. -/
-theorem no_sameLevel_fullRuleClassifier_of_fixedPointFree
+theorem no_sameLevel_fullRuleClassifier_of_fixedPointFree.{u}
     {U : Type u} (evaluate : U → U → U) (polarity : U → U)
     (hpolarity : ∀ value, polarity value ≠ value) :
     ¬ClassifiesAllEndorules evaluate :=
@@ -160,21 +158,21 @@ def ClassifiesAllBooleanSubaggregates.{u} {U : Type u}
   ∀ profile : U → Bool, ∃ code : U, membership code = profile
 
 /-- Full Boolean self-classification is exactly weak point-surjectivity of the evaluator. -/
-theorem classifiesAllBooleanSubaggregates_iff_weaklyPointSurjective
+theorem classifiesAllBooleanSubaggregates_iff_weaklyPointSurjective.{u}
     {U : Type u} (membership : U → U → Bool) :
     ClassifiesAllBooleanSubaggregates membership ↔ WeaklyPointSurjective membership :=
   Iff.rfl
 
 /-- No aggregate can internally classify every Boolean subaggregate of itself through a same-level
 membership/evaluation table. -/
-theorem no_sameLevel_fullBooleanSubaggregateClassifier
+theorem no_sameLevel_fullBooleanSubaggregateClassifier.{u}
     {U : Type u} (membership : U → U → Bool) :
     ¬ClassifiesAllBooleanSubaggregates membership :=
   no_complete_bool_self_encoding membership
 
 /-- Consequently there is no same-level Boolean membership rule together with unrestricted
 comprehension of all Boolean subaggregates. -/
-theorem no_selfContainedBooleanComprehension (U : Type u) :
+theorem no_selfContainedBooleanComprehension.{u} (U : Type u) :
     ¬∃ membership : U → U → Bool, ClassifiesAllBooleanSubaggregates membership := by
   rintro ⟨membership, hmembership⟩
   exact no_sameLevel_fullBooleanSubaggregateClassifier membership hmembership
