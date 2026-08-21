@@ -49,6 +49,33 @@ forces every observable endomorphism to have a fixed point. Boolean negation the
 complete Boolean-valued self-encoding. This is a conditional obstruction, not an unconditional
 proof that every weak notion of a universal aggregate is impossible.
 
+### Proof fibers and incompleteness
+
+A proof system is represented by a proof aggregate and a conclusion rule into the sentence
+aggregate. For a sentence `σ`, the two coordinates
+
+```text
+(Nonempty (ProofFiber σ), Nonempty (ProofFiber (neg σ)))
+```
+
+record provability and refutability. Syntactic negation swaps these two coordinates.
+
+The fixed points of this swap have exactly two possible shapes:
+
+```text
+(empty, empty)          -- independence
+(inhabited, inhabited)  -- local inconsistency
+```
+
+Lean verifies that consistency removes the second shape. Consequently, any diagonal construction
+that produces a proof-status fixed point forces an independent sentence, and a consistent system
+with such diagonal closure cannot be complete.
+
+The file also separates the purely structural result from Gödel's applicability hypotheses.
+Gödel numbering, recursive enumerability or decidability of the proof relation, internal
+representability of proof-fiber inhabitance, and diagonal substitution are additional structures
+needed to construct the fixed point in arithmetic. They are not consequences of bare fibers.
+
 ### Groups
 
 - Stabilizers are fibers of orbit rules.
@@ -93,9 +120,10 @@ restriction to the solution fiber yields conservation of the associated current.
 
 ## What this prototype does not prove
 
-Bare fiber structure does not produce analytic estimates, coercivity, boundary regularity,
-compactness, Hecke theory, Sturm bounds, or a full theory of meromorphic modular functions. Those
-require additional algebraic, topological, smooth, measure-theoretic, and analytic structure.
+Bare fiber structure does not produce recursive coding, internal truth or provability predicates,
+analytic estimates, coercivity, boundary regularity, compactness, Hecke theory, Sturm bounds, or a
+full theory of meromorphic modular functions. Those require additional logical, computability,
+algebraic, topological, smooth, measure-theoretic, and analytic structure.
 
 Lean's ordinary equality is also proof-irrelevant, so this prototype is the set-level shadow of the
 higher-identity theory discussed philosophically. A genuinely higher version would need explicit
