@@ -147,8 +147,9 @@ theorem not_complete_of_consistent_hasStatusFixedPoint
 It is intentionally noncomputable: Gödel's applicability additionally requires that the relevant
 status predicate be effectively representable inside the system. -/
 noncomputable def proofOrientation
-    (S : ProofSystem Sentence Proof) (σ : Sentence) : Bool :=
-  if S.Provable σ then true else false
+    (S : ProofSystem Sentence Proof) (σ : Sentence) : Bool := by
+  classical
+  exact if S.Provable σ then true else false
 
 @[simp]
 theorem proofOrientation_eq_true_iff
