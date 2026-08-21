@@ -2,6 +2,7 @@ import FiberAggregation.Core
 import FiberAggregation.Logic
 import FiberAggregation.Diagonal
 import FiberAggregation.Incompleteness
+import FiberAggregation.Universality
 import FiberAggregation.Group
 import FiberAggregation.Noether
 import FiberAggregation.LinearEquation
@@ -14,7 +15,7 @@ import FiberAggregation.EllipticPDE
 # Fiber Aggregation
 
 A Lean-checked conservative model of the proposed fiber–aggregation language, together with
-diagonal and proof-fiber incompleteness obstructions and applications to group actions, an abstract
-Noether theorem, modular forms and q-expansions, linear equations, Weierstrass equations,
-j-invariant fibers, and elliptic-type operators.
+stratified universal-fiber constructions, diagonal and proof-fiber incompleteness obstructions, and
+applications to group actions, an abstract Noether theorem, modular forms and q-expansions, linear
+equations, Weierstrass equations, j-invariant fibers, and elliptic-type operators.
 -/
